@@ -1,6 +1,6 @@
 SET @cc = 'DE';
 
-select b.`Group` AS Determinand_Group, Determinand_Nutrients, 
+select s.WaterbaseId, s.NationalStationName, s.RiverName, s.RBDcode,
 	COUNT(IF(Year = 1992, 1, null)) AS '1992',
 	COUNT(IF(Year = 1993, 1, null)) AS '1993',
 	COUNT(IF(Year = 1994, 1, null)) AS '1994',
@@ -24,21 +24,22 @@ select b.`Group` AS Determinand_Group, Determinand_Nutrients,
 	COUNT(IF(Year = 2012, 1, null)) AS '2012',
 	COUNT(IF(Year between 1992 and 2012, 1, null)) AS 'Grand Total'
 
-from data_nutrients as a
-left join waterbase_common.tb_fiche_determinand_order as b using(Determinand_Nutrients)
+from data_stations as s
+inner join data_nutrients as a using(CountryCode, NationalStationID)
 
 where 1
-# država
-and CountryCode = @cc
-# splošni pogoj
-and dataset_record = 1
-and (RecordDelete is null or RecordDelete != 1)
 
-GROUP BY Determinand_Nutrients
+and CountryCode = @cc
+
+and s.dataset_record = 1 and (s.RecordDelete is null or s.RecordDelete != 1)
+and a.dataset_record = 1 and (a.RecordDelete is null or a.RecordDelete != 1)
+
+GROUP BY CountryCode, NationalStationID
 
 UNION
 
-select 'Total' AS Determinand_Group, NULL AS Determinand_Nutrients, 
+# TODO: pri total pridejo drugačne številke kot v excelu
+select 'Total' AS WaterbaseId, null as NationalStationName, null as RiverName, null as RBDcode, 
 	COUNT(IF(Year = 1992, 1, null)) AS '1992',
 	COUNT(IF(Year = 1993, 1, null)) AS '1993',
 	COUNT(IF(Year = 1994, 1, null)) AS '1994',
@@ -62,17 +63,14 @@ select 'Total' AS Determinand_Group, NULL AS Determinand_Nutrients,
 	COUNT(IF(Year = 2012, 1, null)) AS '2012',
 	COUNT(IF(Year between 1992 and 2012, 1, null)) AS 'Grand Total'
 
-from data_nutrients
+from data_stations as s
+inner join data_nutrients as a using(CountryCode, NationalStationID)
 
 where 1
-# država
+
 and CountryCode = @cc
 
-# splošni pogoj
-and dataset_record = 1
-and (RecordDelete is null or RecordDelete != 1)
+and s.dataset_record = 1 and (s.RecordDelete is null or s.RecordDelete != 1)
+and a.dataset_record = 1 and (a.RecordDelete is null or a.RecordDelete != 1)
 
-
-ORDER BY Determinand_Group
 ;
-
