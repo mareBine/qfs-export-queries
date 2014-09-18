@@ -1,4 +1,4 @@
-SET @cc = 'SI';
+SET @cc = 'DE';
 
 select Determinand_Nutrients, 
 	COUNT(IF(Year = 1992, 1, null)) AS '1992',
