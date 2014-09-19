@@ -1,5 +1,5 @@
 ### loop  @cc = {'SI,'HR'}
-SET @cc = 'SI';
+SET @cc = 'FR';
 
 ### AggregationPeriod ###
 select AggregationPeriod, 
